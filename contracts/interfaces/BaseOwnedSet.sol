@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 // Copyright 2018, Parity Technologies Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,12 +22,12 @@
 // currently active validator set. The base implementation of `finalizeChange`
 // validates that there are existing unfinalized changes.
 
-pragma solidity ^0.4.22;
+pragma solidity ^0.8.19;
 
 import "./Owned.sol";
 
 
-contract BaseOwnedSet is Owned {
+abstract contract BaseOwnedSet is Owned {
 	// EVENTS
 	event ChangeFinalized(address[] currentSet);
 
@@ -47,9 +49,9 @@ contract BaseOwnedSet is Owned {
 	uint public recentBlocks = 20;
 
 	// Current list of addresses entitled to participate in the consensus.
-	address[] validators;
-	address[] pending;
-	mapping(address => AddressStatus) status;
+	address[] public validators;
+	address[] public pending;
+	mapping(address => AddressStatus) public status;
 
 	// MODIFIERS
 
@@ -67,32 +69,31 @@ contract BaseOwnedSet is Owned {
 		bool isIn = status[_someone].isIn;
 		uint index = status[_someone].index;
 
-		require(isIn && index < validators.length && validators[index] == _someone);
+		require(isIn && index < validators.length && validators[index] == _someone, "Provided address is not a validator");
 		_;
 	}
 
 	modifier isNotValidator(address _someone) {
-		require(!status[_someone].isIn);
+		require(!status[_someone].isIn, "Provided address is already a validator");
 		_;
 	}
 
 	modifier isRecent(uint _blockNumber) {
-		require(block.number <= _blockNumber + recentBlocks && _blockNumber < block.number);
+		require(block.number <= _blockNumber + recentBlocks && _blockNumber < block.number, "Is not recent");
 		_;
 	}
 
 	modifier whenFinalized() {
-		require(finalized);
+		require(finalized, "Is not finalized");
 		_;
 	}
 
 	modifier whenNotFinalized() {
-		require(!finalized);
+		require(!finalized, "Is finalized");
 		_;
 	}
 
-	constructor(address[] _initial)
-		public
+	constructor(address[] memory _initial)
 	{
 		pending = _initial;
 		for (uint i = 0; i < _initial.length; i++) {
@@ -127,8 +128,9 @@ contract BaseOwnedSet is Owned {
 		uint index = status[_validator].index;
 		pending[index] = pending[pending.length - 1];
 		status[pending[index]].index = index;
-		delete pending[pending.length - 1];
-		pending.length--;
+		delete pending[pending.length - 1];	// Set the last element to zero. The length of the array stays the same
+		// pending.length--;
+		pending.pop();			// Remove the last element from the array. The length decrements 
 
 		// Reset address status
 		delete status[_validator];
@@ -149,7 +151,7 @@ contract BaseOwnedSet is Owned {
 	function getValidators()
 		external
 		view
-		returns (address[])
+		returns (address[] memory)
 	{
 		return validators;
 	}
@@ -158,7 +160,7 @@ contract BaseOwnedSet is Owned {
 	function getPending()
 		external
 		view
-		returns (address[])
+		returns (address[] memory)
 	{
 		return pending;
 	}
@@ -180,7 +182,7 @@ contract BaseOwnedSet is Owned {
 		address _reporter,
 		address _validator,
 		uint _blockNumber,
-		bytes _proof
+		bytes calldata _proof	// Is not being used, remove?
 	)
 		internal
 		isValidator(_reporter)
@@ -211,5 +213,5 @@ contract BaseOwnedSet is Owned {
 	}
 
 	function initiateChange()
-		private;
+		internal virtual;
 }

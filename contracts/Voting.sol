@@ -1,4 +1,6 @@
-pragma solidity ^0.4.22;
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.19;
 
 import './interfaces/Owned.sol';
 
@@ -54,7 +56,7 @@ contract Voting is Owned {
     //uint public numProposalOptions;
 
 
-    constructor() public {
+    constructor()  {
         chairperson = msg.sender;
         numVoters=1;
         Voter storage v = voters[numVoters];
@@ -72,7 +74,7 @@ contract Voting is Owned {
         chairperson = newAddress;
     }
 
-    function createProposal(string proposalName, bytes32[] optionNames, uint votingTime, uint proposalBatchNumber) public {  
+    function createProposal(string memory proposalName, bytes32[] memory optionNames, uint votingTime, uint proposalBatchNumber) public {  
         if (msg.sender != chairperson) {
             // `revert()` terminates and reverts all changes to the state
             revert();
@@ -83,7 +85,8 @@ contract Voting is Owned {
         p.name = proposalName;
         p.numOptions=0;
         p.isEnded=false;
-        p.votingStart = now;
+        //p.votingStart = now;
+        p.votingStart = block.timestamp;
         p.votingTime = votingTime;
         p.proposalBatch = proposalBatchNumber;
         p.winningProposalOption=99999;
@@ -159,18 +162,22 @@ contract Voting is Owned {
     }
 
     function vote(uint proposal, uint proposalOption) public {
-        if (now > proposals[proposal].votingStart + proposals[proposal].votingTime) {
+        if (block.timestamp > proposals[proposal].votingStart + proposals[proposal].votingTime) {
             // Revert the call if the voting period is over
             revert();
         }
+        
 
-        //Voter sender = voters[msg.sender];
-
+        // Voter storage sender = voters[msg.sender];
+        // Voter storage sender;
+        Voter storage sender;
         for (uint i=1; i<=numVoters;i++){
             if (voters[i].addr==msg.sender){
-                Voter storage sender = voters[i];
+                sender = voters[i];
             }
         }
+        
+        require(sender.addr != address(0), "Voter is not in the list");
 
         if (sender.votes[proposal].voted==true){
             revert();
@@ -184,18 +191,20 @@ contract Voting is Owned {
         sender.votes[proposal].vote = proposalOption;
         proposals[proposal].proposalOptions[proposalOption].voteCount += sender.weight;
         proposals[proposal].numCastedVotes +=1;
-        Voted (sender.addr, proposal, proposalOption);
+        emit Voted (sender.addr, proposal, proposalOption);
         
     }
 
     function hasUserVoted(uint proposal, address user) public view 
             returns (bool result)
     {        
+        Voter storage sender;
         for (uint i=1; i<=numVoters;i++){
             if (voters[i].addr==user){
-                Voter storage sender = voters[i];
+                sender = voters[i];
             }
         }
+        require(sender.addr != address(0), "Voter is not in the list");
         result=sender.votes[proposal].voted;            
     }
 
@@ -215,12 +224,12 @@ contract Voting is Owned {
     }
 
     function finalizeProposal(uint proposal) public
-            returns (string proposalName, uint winningProposalOption, bytes32 winningProposalOptionName)
+            returns (string memory proposalName, uint winningProposalOption, bytes32 winningProposalOptionName)
         {
         if (msg.sender != chairperson) {            
             revert();
         }
-        if (now <= proposals[proposal].votingStart + proposals[proposal].votingTime){
+        if (block.timestamp <= proposals[proposal].votingStart + proposals[proposal].votingTime){
             revert(); // voting did not yet end
         }
         if (proposals[proposal].isEnded == true){
@@ -244,7 +253,7 @@ contract Voting is Owned {
         proposals[proposal].winningProposalOptionName=winningProposalOptionName;
         proposals[proposal].isEnded=true;
         numEndedProposals=numEndedProposals+1;
-        ProposalEnded(proposal, winningProposalOption);
+        emit ProposalEnded(proposal, winningProposalOption);
 
         uint proposalsInBatch = 0;
         for (uint j=0; j<=numProposals;j++){
@@ -255,7 +264,7 @@ contract Voting is Owned {
         //uint precision = 0; //precision is how many decimal places to round, currently it is set to only whole numbers
         uint dynamicVoterWeight = uint(100)*(10**0) / proposalsInBatch; //Calculates a dynamic voting weight based on the total amount of proposals in a batch.
         
-        for (i=1; i<=numVoters;i++){
+        for (uint256 i=1; i<=numVoters;i++){
             Voter storage voter = voters[i];
             
             if(voter.votes[proposal].voted == true){
@@ -282,7 +291,7 @@ contract Voting is Owned {
     }
 
     function getProposalResult(uint proposal) public view
-            returns (string proposalName, uint winningProposalOption, bytes32 winningProposalOptionName, uint proposalBatchNumber)
+            returns (string memory proposalName, uint winningProposalOption, bytes32 winningProposalOptionName, uint proposalBatchNumber)
     {
         if(proposals[proposal].isEnded){
             proposalName = proposals[proposal].name;
@@ -291,7 +300,7 @@ contract Voting is Owned {
             winningProposalOptionName=proposals[proposal].proposalOptions[winningProposalOption].name;
         }
         else{
-            if (now <= proposals[proposal].votingStart + proposals[proposal].votingTime){
+            if (block.timestamp <= proposals[proposal].votingStart + proposals[proposal].votingTime){
                 revert(); // voting did not yet end
             }
 
@@ -312,20 +321,22 @@ contract Voting is Owned {
     
 
     function getProposalDetailsForVoter(uint proposal, address user) public view
-            returns (string proposalName, uint numOptions, bytes32[] optionNames )
+            returns (string memory proposalName, uint numOptions, bytes32[] memory optionNames )
     {       
-        if (now <= proposals[proposal].votingStart + proposals[proposal].votingTime){// voting did not yet end            
+        if (block.timestamp <= proposals[proposal].votingStart + proposals[proposal].votingTime){// voting did not yet end  
+            Voter storage sender;          
             for (uint i=1; i<=numVoters;i++){
                 if (voters[i].addr==user){
-                    Voter storage sender = voters[i];
+                    sender = voters[i];
                     }
             }
+            require(sender.addr != address(0), "Voter is not in the list");
             //result=sender.votes[proposal].voted;
             if(sender.votes[proposal].voted==false){ //user hasn't voted for this proposal
                 proposalName = proposals[proposal].name;     
                 numOptions = proposals[proposal].numOptions;
                 optionNames=new bytes32[](numOptions);
-                for (i = 0; i < proposals[proposal].numOptions; i++) {
+                for (uint256 i = 0; i < proposals[proposal].numOptions; i++) {
                     optionNames[i]=proposals[proposal].proposalOptions[i].name;
                 }
             }

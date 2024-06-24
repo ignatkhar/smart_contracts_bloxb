@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 // Copyright 2018 Parity Technologies Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +20,7 @@
 // trigger a change, since the engine will be listening for events emitted by
 // the outer relay contract.
 
-pragma solidity ^0.4.22;
+pragma solidity ^0.8.19;
 
 import "./interfaces/Owned.sol";
 import "./interfaces/ValidatorSet.sol";

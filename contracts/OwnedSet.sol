@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 // Copyright 2017 Peter Czaban, Parity Technologies Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +16,7 @@
 
 // An owned validator set contract where the owner can add or remove validators.
 
-pragma solidity ^0.4.22;
+pragma solidity ^0.8.19;
 
 import "./interfaces/BaseOwnedSet.sol";
 import "./interfaces/ValidatorSet.sol";
@@ -32,8 +34,7 @@ contract OwnedSet is ValidatorSet, BaseOwnedSet {
 		_;
 	}
 
-	constructor(address[] _initial) BaseOwnedSet(_initial)
-		public
+	constructor(address[] memory _initial) BaseOwnedSet(_initial)
 	{
 		systemAddress = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
 	}
@@ -54,7 +55,7 @@ contract OwnedSet is ValidatorSet, BaseOwnedSet {
 		baseReportBenign(msg.sender, _validator, _blockNumber);
 	}
 
-	function reportMalicious(address _validator, uint256 _blockNumber, bytes _proof)
+	function reportMalicious(address _validator, uint256 _blockNumber, bytes calldata _proof)
 		external
 	{
 		baseReportMalicious(
@@ -69,8 +70,16 @@ contract OwnedSet is ValidatorSet, BaseOwnedSet {
 
 	// Log desire to change the current list.
 	function initiateChange()
-		private
+		internal override
 	{
 		emit InitiateChange(blockhash(block.number - 1), pending);
+	}
+
+	function getValidators()
+		external
+		view override (BaseOwnedSet, ValidatorSet)
+		returns (address[] memory)
+	{
+		return validators;
 	}
 }

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 // The owned contract.
 //
 // Copyright 2016 Gavin Wood, Parity Technologies Ltd.
@@ -14,16 +16,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pragma solidity ^0.4.22;
+pragma solidity ^0.8.19;
 
 
 contract Owned {
 	event NewOwner(address indexed old, address indexed current);
 
-	address public owner = msg.sender;
+	address public owner;
+
+	constructor(){
+		owner = msg.sender;
+	}
 
 	modifier onlyOwner {
-		require(msg.sender == owner);
+		require(msg.sender == owner, "This function can be called only by the owner");
 		_;
 	}
 

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 // Copyright 2018 Parity Technologies Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +17,7 @@
 // A testable version of the `InnerOwnedSet` and `OuterSet` contracts that
 // exposes some internal state and overrides de default system address.
 
-pragma solidity ^0.4.22;
+pragma solidity ^0.8.19;
 
 import "../RelayedOwnedSet.sol";
 import "../RelaySet.sol";

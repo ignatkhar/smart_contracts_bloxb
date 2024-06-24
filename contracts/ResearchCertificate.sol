@@ -1,4 +1,7 @@
-pragma solidity ^0.6.0;
+// SPDX-License-Identifier: MIT
+
+
+pragma solidity ^0.8.19;
 
 /**
  * @dev Collection of functions related to the address type
@@ -45,14 +48,14 @@ library Address {
      * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
      */
     function sendValue(address payable recipient, uint256 amount) internal {
-        require(address(this).balance >= amount, "Address: insufficient balance");
-        (bool success, ) = recipient.call.value(amount)("");
-        require(success, "Address: unable to send value, recipient may have reverted");
-    }
+    require(address(this).balance >= amount, "Address: insufficient balance");
+    (bool success, ) = recipient.call{value: amount}("");
+    require(success, "Address: unable to send value, recipient may have reverted");
+}
 }
 
   
-pragma solidity ^0.6.0;
+pragma solidity ^0.8.19;
 
 /**
  * @dev Wrappers over Soliditys arithmetic operations with added overflow
@@ -203,7 +206,7 @@ library SafeMath {
 
 
 
-pragma solidity ^0.6.0;
+pragma solidity ^0.8.19;
 
 
 /**
@@ -241,7 +244,7 @@ library Counters {
 
 
 
-pragma solidity ^0.6.0;
+pragma solidity ^0.8.19;
 
 /**
  * @title ERC721 token receiver interface
@@ -268,8 +271,7 @@ abstract contract IERC721Receiver {
 }
 
 
-pragma solidity ^0.6.0;
-
+pragma solidity ^0.8.19;
 /**
  * @dev Interface of the ERC165 standard, as defined in the
  * https://eips.ethereum.org/EIPS/eip-165[EIP].
@@ -293,7 +295,7 @@ interface IERC165 {
 
 
 
-pragma solidity ^0.6.0;
+pragma solidity ^0.8.19;
 
 
 /**
@@ -313,7 +315,7 @@ contract ERC165 is IERC165 {
      */
     mapping(bytes4 => bool) private _supportedInterfaces;
 
-    constructor () internal {
+    constructor (){
         _registerInterface(_INTERFACE_ID_ERC165);
     }
 
@@ -344,7 +346,7 @@ contract ERC165 is IERC165 {
 }
 
 
-pragma solidity ^0.6.2;
+pragma solidity ^0.8.19;
 
 
 /**
@@ -395,7 +397,7 @@ interface IERC721 is IERC165 {
 }
 
 
-pragma solidity ^0.6.2;
+pragma solidity ^0.8.19;
 
 
 /**
@@ -410,7 +412,7 @@ interface IERC721Metadata is IERC721 {
 }
 
 
-pragma solidity ^0.6.2;
+pragma solidity ^0.8.19;
 
 
 /**
@@ -426,7 +428,7 @@ interface IERC721Enumerable is IERC721 {
 
 
 
-pragma solidity ^0.6.0;
+pragma solidity ^0.8.19;
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -439,10 +441,10 @@ pragma solidity ^0.6.0;
  * This contract is only required for intermediate, library-like contracts.
  */
 contract Context {
-    constructor () internal { }
+    constructor () { }
 
     function _msgSender() internal view virtual returns (address payable) {
-        return msg.sender;
+        return payable(msg.sender);
     }
 
     function _msgData() internal view virtual returns (bytes memory) {
@@ -455,7 +457,7 @@ contract Context {
 
 
 
-pragma solidity ^0.6.0;
+pragma solidity ^0.8.19;
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -477,7 +479,7 @@ contract Ownable is Context {
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
      */
-    constructor () internal {
+    constructor ()  {
         address msgSender = _msgSender();
         _owner = msgSender;
         emit OwnershipTransferred(address(0), msgSender);
@@ -523,7 +525,7 @@ contract Ownable is Context {
 
 
 
-pragma solidity ^0.6.0;
+pragma solidity ^0.8.19;
 
 
 
@@ -567,7 +569,7 @@ contract ERC721 is Context, ERC165, IERC721 {
      */
     bytes4 private constant _INTERFACE_ID_ERC721 = 0x80ac58cd;
 
-    constructor () public {
+    constructor ()  {
         _registerInterface(_INTERFACE_ID_ERC721);
     }
 
@@ -885,7 +887,7 @@ contract ERC721 is Context, ERC165, IERC721 {
 
 
 
-pragma solidity ^0.6.0;
+pragma solidity ^0.8.19;
 
 
 
@@ -914,9 +916,9 @@ contract ERC721Metadata is Context, ERC165, ERC721, IERC721Metadata {
     /**
      * @dev Constructor function
      */
-    constructor (string memory name, string memory symbol) public {
-        _name = name;
-        _symbol = symbol;
+    constructor (string memory input_name, string memory input_symbol)  {
+        _name = input_name;
+        _symbol = input_symbol;
 
         _registerInterface(_INTERFACE_ID_ERC721_METADATA);
     }
@@ -1007,8 +1009,8 @@ contract ERC721Metadata is Context, ERC165, ERC721, IERC721Metadata {
      * @dev Internal function to set the base URI for all token IDs. It is
      * automatically added as a prefix to the value returned in {tokenURI}.
      */
-    function _setBaseURI(string memory baseURI) internal virtual {
-        _baseURI = baseURI;
+    function _setBaseURI(string memory input_baseURI) internal virtual {
+        _baseURI = input_baseURI;
     }
 
     /**
@@ -1034,7 +1036,7 @@ contract ERC721Metadata is Context, ERC165, ERC721, IERC721Metadata {
 }
 
 
-pragma solidity ^0.6.0;
+pragma solidity ^0.8.19;
 
 
 
@@ -1065,7 +1067,7 @@ contract ERC721Enumerable is Context, ERC165, ERC721, IERC721Enumerable {
     /**
      * @dev Constructor function.
      */
-    constructor () public {
+    constructor () {
         _registerInterface(_INTERFACE_ID_ERC721_ENUMERABLE);
     }
 
@@ -1153,7 +1155,7 @@ contract ERC721Enumerable is Context, ERC165, ERC721, IERC721Enumerable {
      * @param tokenId uint256 ID of the token to be removed from the tokens list of the given address
      */
     function _removeTokenFromOwnerEnumeration(address from, uint256 tokenId) private {
-        uint256 lastTokenIndex = _ownedTokens[from].length.sub(1);
+        uint256 lastTokenIndex = _ownedTokens[from].length - 1;
         uint256 tokenIndex = _ownedTokensIndex[tokenId];
 
         if (tokenIndex != lastTokenIndex) {
@@ -1173,7 +1175,7 @@ contract ERC721Enumerable is Context, ERC165, ERC721, IERC721Enumerable {
      * @param tokenId uint256 ID of the token to be removed from the tokens list
      */
     function _removeTokenFromAllTokensEnumeration(uint256 tokenId) private {
-        uint256 lastTokenIndex = _allTokens.length.sub(1);
+        uint256 lastTokenIndex = _allTokens.length - 1;
         uint256 tokenIndex = _allTokensIndex[tokenId];
 
         uint256 lastTokenId = _allTokens[lastTokenIndex];
@@ -1188,7 +1190,7 @@ contract ERC721Enumerable is Context, ERC165, ERC721, IERC721Enumerable {
 }
 
 
-pragma solidity ^0.6.0;
+pragma solidity ^0.8.19;
 
 
 
@@ -1200,7 +1202,7 @@ pragma solidity ^0.6.0;
  * See https://eips.ethereum.org/EIPS/eip-721
  */
 contract ERC721Full is ERC721Enumerable, ERC721Metadata {
-    constructor (string memory name, string memory symbol) public ERC721Metadata(name, symbol) { }
+    constructor (string memory name, string memory symbol)  ERC721Metadata(name, symbol) { }
 
     function _beforeTokenTransfer(address from, address to, uint256 tokenId)
         virtual
@@ -1211,7 +1213,7 @@ contract ERC721Full is ERC721Enumerable, ERC721Metadata {
     }
 }
 
-pragma solidity ^0.6.0;
+pragma solidity ^0.8.19;
 
 
 
@@ -1220,7 +1222,7 @@ contract ResearchCertificate is ERC721Full, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    constructor() ERC721Full("ResearchObjectCertification", "ROC") public {
+    constructor() ERC721Full("ResearchObjectCertification", "ROC")  {
     }
 
     function createCertificate(address recipient, string memory tokenURI, string memory tokenHash) onlyOwner public returns (uint256) {

@@ -1,4 +1,7 @@
-pragma solidity >=0.4.22 <0.6.0;
+// SPDX-License-Identifier: MIT
+
+// pragma solidity >=0.4.22 <0.6.0;
+pragma solidity ^0.8.19;
 
 import "./libs/SafeMath.sol";
 import "./interfaces/BaseOwnedSet.sol";

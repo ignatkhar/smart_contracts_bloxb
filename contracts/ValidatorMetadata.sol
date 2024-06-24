@@ -1,4 +1,6 @@
-pragma solidity ^0.4.24;
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.19;
 
 import "./libs/SafeMath.sol";
 import "./interfaces/IBallotsStorage.sol";

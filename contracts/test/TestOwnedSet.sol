@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 // Copyright 2018 Parity Technologies Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +17,14 @@
 // A testable version of the `OwnedSet` contract that exposes some internal
 // state and overrides the default system address.
 
-pragma solidity ^0.4.22;
+pragma solidity ^0.8.19;
 
 import "../OwnedSet.sol";
 
 
 contract TestOwnedSet is OwnedSet {
-	constructor(address _systemAddress, address[] _initial) OwnedSet(_initial)
-		public
+	constructor(address _systemAddress, address[] memory _initial) OwnedSet(_initial)
+		
 	{
 		systemAddress = _systemAddress;
 	}
