@@ -2,24 +2,26 @@
 
 pragma solidity ^0.8.19;
 
-contract Owned {
-	event NewOwner(address indexed old, address indexed current);
+import './interfaces/Owned.sol';
 
-	address public owner = msg.sender;
+// contract Owned {
+// 	event NewOwner(address indexed old, address indexed current);
 
-	modifier onlyOwner {
-		require(msg.sender == owner);
-		_;
-	}
+// 	address public owner = msg.sender;
 
-	function setOwner(address _new)
-		external
-		onlyOwner
-	{
-		emit NewOwner(owner, _new);
-		owner = _new;
-	}
-}
+// 	modifier onlyOwner {
+// 		require(msg.sender == owner);
+// 		_;
+// 	}
+
+// 	function setOwner(address _new)
+// 		external
+// 		onlyOwner
+// 	{
+// 		emit NewOwner(owner, _new);
+// 		owner = _new;
+// 	}
+// }
 
 contract Voting is Owned {
     // Declare a complex type to reresent a single voter.
@@ -177,6 +179,7 @@ contract Voting is Owned {
             if (totalvoters[i] == voterAddress){
                delete totalvoters[i];
                numVoters = numVoters - 1;
+               break;
            }
         }
         delete voters[voterAddress];

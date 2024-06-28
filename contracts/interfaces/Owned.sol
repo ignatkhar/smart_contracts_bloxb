@@ -16,6 +16,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// The contract establishes ownership control over contract operations. 
+// It initializes with the deployer's address as the owner and includes 
+// a modifier onlyOwner to restrict certain functions to the contract owner only. 
+// The setOwner function allows the current owner to transfer ownership to a new 
+// address while emitting an event NewOwner to log ownership changes.
+
 pragma solidity ^0.8.19;
 
 

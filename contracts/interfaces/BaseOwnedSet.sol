@@ -30,8 +30,7 @@ import "./Owned.sol";
 abstract contract BaseOwnedSet is Owned {
 	// EVENTS
 	event ChangeFinalized(address[] currentSet);
-
-	// STATE
+	event Report(address indexed reporter, address indexed reported, bool indexed malicious);
 
 	// Was the last validator change finalized. Implies validators == pending
 	bool public finalized;
@@ -41,9 +40,6 @@ abstract contract BaseOwnedSet is Owned {
 		bool isIn;
 		uint index;
 	}
-
-	// EVENTS
-	event Report(address indexed reporter, address indexed reported, bool indexed malicious);
 
 	// STATE
 	uint public recentBlocks = 20;
@@ -182,7 +178,7 @@ abstract contract BaseOwnedSet is Owned {
 		address _reporter,
 		address _validator,
 		uint _blockNumber,
-		bytes calldata _proof	// Is not being used, remove?
+		bytes calldata _proof
 	)
 		internal
 		isValidator(_reporter)
